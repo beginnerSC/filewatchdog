@@ -2,18 +2,15 @@
 
 Runs Python functions once a certain file is created or modified. 
 
-
 ## Installation
 
-.. code-block:: bash
-
+```sh
     pip install filewatchdog
-
+```
 
 ## Usage
 
-.. code-block:: python
-
+```py
     import filewatchdog as watcher
     import time
 
@@ -28,3 +25,4 @@ Runs Python functions once a certain file is created or modified.
     while True:
         watcher.run_pending()
         time.sleep(1)
+```
