@@ -6,6 +6,29 @@
 Welcome to FileWatchdog's documentation!
 ========================================
 
+**Package Status**
+
+.. image:: https://readthedocs.org/projects/filewatchdog/badge/?version=latest
+   :target: https://filewatchdog.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+
+
+.. image:: https://img.shields.io/pypi/v/filewatchdog.svg
+   :target: https://pypi.python.org/pypi/filewatchdog/
+   :alt: PyPI
+
+
+.. image:: https://static.pepy.tech/badge/filewatchdog
+   :target: https://pepy.tech/project/filewatchdog
+   :alt: Downloads
+
+
+.. image:: License-MIT-yellow.svg
+   :target: https://github.com/beginnerSC/filewatchdog/blob/master/LICENSE
+   :alt: License
+
+----
+
 Runs Python functions once a certain file is created or modified. 
 
 
