@@ -23,7 +23,7 @@ Welcome to FileWatchdog's documentation!
    :alt: Downloads
 
 
-.. image:: License-MIT-yellow.svg
+.. image:: https://img.shields.io/badge/License-MIT-yellow.svg
    :target: https://github.com/beginnerSC/filewatchdog/blob/master/LICENSE
    :alt: License
 
