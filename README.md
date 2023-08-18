@@ -1,5 +1,12 @@
 # FileWatchdog
 
+[![Documentation Status](https://readthedocs.org/projects/filewatchdog/badge/?version=latest)](https://filewatchdog.readthedocs.io/en/latest/?badge=latest)
+[![PyPI](http://img.shields.io/pypi/v/filewatchdog.svg)](https://pypi.python.org/pypi/filewatchdog/)
+[![Downloads](https://static.pepy.tech/badge/filewatchdog)](https://pepy.tech/project/filewatchdog)
+[![Downloads](https://static.pepy.tech/badge/filewatchdog/month)](https://pepy.tech/project/filewatchdog)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/beginnerSC/filewatchdog/blob/master/LICENSE)
+
+
 Runs Python functions once a certain file is created or modified. 
 
 ## Installation
