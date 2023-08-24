@@ -3,25 +3,25 @@ import functools, datetime, logging, pathlib
 from time import sleep
 from typing import List, Optional, Callable
 
-logger = logging.getLogger("filewatchdog")
+logger = logging.getLogger("watcher")
 
 
-class FileWatchdogError(Exception):
-    """Base watchdog exception"""
+class WatcherError(Exception):
+    """Base watcher exception"""
     
     pass
 
-class FileWatchdog:
+class Watcher:
     def __init__(self) -> None:
-        self.jobs: List[FileWatchdogJob] = []
+        self.jobs: List[WatcherJob] = []
 
-    def once(self) -> "FileWatchdogJob":
-        job = FileWatchdogJob(self)
+    def once(self) -> "WatcherJob":
+        job = WatcherJob(self)
         return job
 
-class FileWatchdogJob:
+class WatcherJob:
 
-    def __init__(self, watchdog: Optional[FileWatchdog] = None, check_period: int = 1, stop_time: str = '19:30', lag: int = 0, breadcrumb: str = 'C:/Temp/breadcrumb.txt'):
+    def __init__(self, watcher: Optional[Watcher] = None, check_period: int = 1, stop_time: str = '19:30', lag: int = 0, breadcrumb: str = 'C:/Temp/breadcrumb.txt'):
         """
         Check the files every `check_period` seconds to see if they exist or are modified and if so, do the job
 
@@ -44,7 +44,7 @@ class FileWatchdogJob:
         # 'one_of' or 'all_of'
         self.num_of: str = None
 
-        self.watchdog: Optional[FileWatchdog] = watchdog
+        self.watcher: Optional[Watcher] = watcher
 
     @property
     def modified(self):
@@ -69,13 +69,13 @@ class FileWatchdogJob:
     def do(self, job_func: Callable, *args, **kwargs):
         self.job_func = functools.partial(job_func, *args, **kwargs)
         functools.update_wrapper(self.job_func, job_func)
-        self._schedule_watchdog_job()
-        if self.watchdog is None:
-            raise FileWatchdogError(
-                "Unable to a add watchdog job. "
-                "Job is not associated with watchdog"
+        self._schedule_watcher_job()
+        if self.watcher is None:
+            raise WatcherError(
+                "Unable to a add watcher job. "
+                "Job is not associated with watcher"
             )
-        self.watchdog.jobs.append(self)
+        self.watcher.jobs.append(self)
         return self
 
     def check_n_do(self):
@@ -107,13 +107,13 @@ class FileWatchdogJob:
         mtime = datetime.datetime.fromtimestamp(pathlib.Path(file).stat().st_mtime)
         return (now - mtime).total_seconds() < self.check_period
 
-    def _schedule_watchdog_job(self) -> None:
+    def _schedule_watcher_job(self) -> None:
         schedule.every(self.check_period).second.until(self.stop_time).do(self.check_n_do)
 
-default_watchdog = FileWatchdog()
+default_watcher = Watcher()
 
-def once() -> FileWatchdogJob:
-    return default_watchdog.once()
+def once() -> WatcherJob:
+    return default_watcher.once()
 
 def run_pending() -> None:
     schedule.run_pending()
