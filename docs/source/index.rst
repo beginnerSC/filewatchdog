@@ -23,6 +23,11 @@ Welcome to FileWatchdog's documentation!
    :alt: Downloads
 
 
+.. image:: https://static.pepy.tech/badge/filewatchdog/month
+   :target: https://pepy.tech/project/filewatchdog
+   :alt: Downloads
+
+
 .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
    :target: https://github.com/beginnerSC/filewatchdog/blob/master/LICENSE
    :alt: License
