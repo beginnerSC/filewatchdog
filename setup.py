@@ -2,7 +2,7 @@ import codecs
 from setuptools import setup
 
 
-FILEWATCHDOG_VERSION = "0.0.1"
+FILEWATCHDOG_VERSION = "0.0.2"
 # SCHEDULE_DOWNLOAD_URL = "https://github.com/dbader/schedule/tarball/" + SCHEDULE_VERSION
 
 
