@@ -1,5 +1,0 @@
-schedule
-sphinx
-sphinx_copybutton
-sphinx_rtd_theme
-twine

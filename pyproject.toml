@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "filewatchdog"
+version = "0.1.0"
+description = "Runs Python functions once a certain file is created or modified."
+authors = ["BeginnerSC"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+schedule = "^1.2.1"
+
+[tool.poetry.group.dev.dependencies]
+Sphinx = "^7.2.6"
+sphinx-copybutton = "^0.5.2"
+sphinx-rtd-theme = "^2.0.0"
+twine = "^4.0.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

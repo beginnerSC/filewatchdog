@@ -21,7 +21,7 @@ class Watcher:
 
 class WatcherJob:
 
-    def __init__(self, watcher: Optional[Watcher] = None, check_period: int = 1, stop_time: str = '19:30', lag: int = 0, breadcrumb: str = 'C:/Temp/breadcrumb.txt'):
+    def __init__(self, watcher: Optional[Watcher] = None, check_period: int = 1, lag: int = 0, breadcrumb: str = 'C:/Temp/breadcrumb.txt'):
         """
         Check the files every `check_period` seconds to see if they exist or are modified and if so, do the job
 
@@ -29,7 +29,6 @@ class WatcherJob:
         """
         self.breadcrumb: str = breadcrumb
         self.check_period: int = check_period
-        self.stop_time: str = stop_time
         self.lag: int = lag
         
         # the job job_func to run
@@ -37,6 +36,7 @@ class WatcherJob:
 
         # list of files to watch
         self.files: List[str] = None
+        self.mtime_last_check: dict[str, datetime.datetime] = {}
 
         # 'exist' or 'modified'
         self.event: str = None
@@ -59,11 +59,17 @@ class WatcherJob:
     def one_of(self, files: List[str]): 
         self.num_of = 'one_of'
         self.files = files
+        for file in self.files:
+            if pathlib.Path(file).exists():
+                self.mtime_last_check.update({file: self._get_mtime(file)})
         return self
     
     def all_of(self, files: List[str]): 
         self.num_of = 'all_of'
         self.files = files
+        for file in self.files:
+            if pathlib.Path(file).exists():
+                self.mtime_last_check.update({file: self._get_mtime(file)})
         return self
     
     def do(self, job_func: Callable, *args, **kwargs):
@@ -101,14 +107,21 @@ class WatcherJob:
             except FileNotFoundError as e:
                 print(f'Watching for modification but the following files are missing: {[file for file in self.files if not pathlib.Path(file).exists()]}')
 
+    def _get_mtime(self, file: str) -> datetime.datetime:
+        """returns timestamp of a file"""
+        return datetime.datetime.fromtimestamp(pathlib.Path(file).stat().st_mtime)
+
     def _was_modified(self, file: str) -> bool: 
         """`file` was modified in the past `self.check_period` seconds"""
-        now = datetime.datetime.now()
-        mtime = datetime.datetime.fromtimestamp(pathlib.Path(file).stat().st_mtime)
-        return (now - mtime).total_seconds() < self.check_period
+        current_mtime = self._get_mtime(file)
+        if self.mtime_last_check[file] != current_mtime:
+            self.mtime_last_check.update({file: current_mtime})
+            return True
+        else:
+            return False
 
     def _schedule_watcher_job(self) -> None:
-        schedule.every(self.check_period).second.until(self.stop_time).do(self.check_n_do)
+        schedule.every(self.check_period).second.until(datetime.timedelta(hours=23, minutes=59)).do(self.check_n_do)
 
 default_watcher = Watcher()
 
