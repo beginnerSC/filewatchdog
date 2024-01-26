@@ -9,6 +9,8 @@
 
 Runs Python functions once a certain file is created or modified. 
 
+Caution! 0.1.0 code change has not been uploaded to pypi.org!
+
 ## Installation
 
 ```sh
