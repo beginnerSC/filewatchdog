@@ -6,6 +6,7 @@
 version: 2
 
 # Set the version of Python and other tools you might need
+# using poetry install on rtd: https://github.com/readthedocs/readthedocs.org/issues/4912
 build:
   os: ubuntu-22.04
   tools:
