@@ -62,7 +62,7 @@ class WatcherJob:
         if isinstance(files,list):
             self.files = files
         elif isinstance(files,str):
-            self.from_folder(files)
+            self.folder(files)
         else:
             raise ValueError("Input must be str of list of str.")
         for file in self.files:
@@ -75,7 +75,7 @@ class WatcherJob:
         if isinstance(files,list):
             self.files = files
         elif isinstance(files,str):
-            self.from_folder(files)
+            self.folder(files)
         else:
             raise ValueError("Input must be str of list of str.")
         for file in self.files:
@@ -134,7 +134,7 @@ class WatcherJob:
     def _schedule_watcher_job(self) -> None:
         schedule.every(self.check_period).second.until(datetime.timedelta(hours=23, minutes=59)).do(self.check_n_do)
     
-    def from_folder(self,file_path:str):
+    def folder(self,file_path:str):
         files = [os.path.join(file_path,f) for f in os.listdir(file_path)]
         if self.files is None:
             self.files = files

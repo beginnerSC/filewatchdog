@@ -5,7 +5,7 @@ def job():
     print("I'm working...")
 
 
-watcher.once().one_of("C:\Temp").modified.do(job)
+watcher.once().folder("C:\Temp").modified.do(job)
 
 while True:
     watcher.run_pending()
