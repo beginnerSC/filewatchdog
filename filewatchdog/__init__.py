@@ -2,6 +2,7 @@ import schedule
 import functools, datetime, logging, pathlib
 from time import sleep
 from typing import List, Optional, Callable
+import os
 
 logger = logging.getLogger("watcher")
 
@@ -55,18 +56,38 @@ class WatcherJob:
     def exist(self):
         self.event = 'exist'
         return self
+    
+    def file(self,file_path:str):
+        if os.path.isfile(file_path):
+            self.files = [file_path]
+        else:
+            raise ValueError(f"Path {file_path} is not a file")
+        return self
+    
+    def folder(self,folder_path:str):
+        if os.path.isdir(folder_path):
+            self._update_from_folders(folder_path)
+        else:
+            raise ValueError(f"Folder path {folder_path} is not a directory")
+        return self
             
-    def one_of(self, files: List[str]): 
+    def one_of(self, files=None): 
         self.num_of = 'one_of'
-        self.files = files
+        if files:
+            self.files = files
+        elif not self.files:
+            raise ValueError("No file or folder input")
         for file in self.files:
             if pathlib.Path(file).exists():
                 self.mtime_last_check.update({file: self._get_mtime(file)})
         return self
     
-    def all_of(self, files: List[str]): 
+    def all_of(self, files=None): 
         self.num_of = 'all_of'
-        self.files = files
+        if files:
+            self.files = files
+        elif not self.files:
+            raise ValueError("No file or folder input")
         for file in self.files:
             if pathlib.Path(file).exists():
                 self.mtime_last_check.update({file: self._get_mtime(file)})
@@ -123,6 +144,14 @@ class WatcherJob:
     def _schedule_watcher_job(self) -> None:
         schedule.every(self.check_period).second.until(datetime.timedelta(hours=23, minutes=59)).do(self.check_n_do)
 
+    def _update_from_folders(self,file_path:str):
+        files = [os.path.join(file_path,f) for f in os.listdir(file_path)]
+        if self.files is None:
+            self.files = files
+        else:
+            self.files = self.files.extend(files)
+        return self
+    
 default_watcher = Watcher()
 
 def once() -> WatcherJob:
