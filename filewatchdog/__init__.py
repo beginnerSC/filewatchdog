@@ -59,35 +59,32 @@ class WatcherJob:
     
     def file(self,file_path:str):
         if os.path.isfile(file_path):
+            self.num_of = 'one_of'
             self.files = [file_path]
+            self.mtime_last_check.update({file_path:self._get_mtime(file_path)})
         else:
             raise ValueError(f"Path {file_path} is not a file")
         return self
     
     def folder(self,folder_path:str):
         if os.path.isdir(folder_path):
-            self._update_from_folders(folder_path)
+            files = [os.path.join(folder_path,f) for f in os.listdir(folder_path)]
+            self.one_of(files)
         else:
             raise ValueError(f"Folder path {folder_path} is not a directory")
         return self
             
-    def one_of(self, files=None): 
+    def one_of(self, files: List[str]): 
         self.num_of = 'one_of'
-        if files:
-            self.files = files
-        elif not self.files:
-            raise ValueError("No file or folder input")
+        self.files = files
         for file in self.files:
             if pathlib.Path(file).exists():
                 self.mtime_last_check.update({file: self._get_mtime(file)})
         return self
     
-    def all_of(self, files=None): 
+    def all_of(self, files: List[str]): 
         self.num_of = 'all_of'
-        if files:
-            self.files = files
-        elif not self.files:
-            raise ValueError("No file or folder input")
+        self.files = files
         for file in self.files:
             if pathlib.Path(file).exists():
                 self.mtime_last_check.update({file: self._get_mtime(file)})
@@ -120,8 +117,8 @@ class WatcherJob:
 
         if self.event == 'modified':
             try:
-                if ((self.num_of=='all_of' and all([self._was_modified(file) for file in self.files])) \
-                    or (self.num_of=='one_of' and any([self._was_modified(file) for file in self.files]))):
+                if ((self.num_of=='all_of' and self._was_modified(self.files)) \
+                    or (self.num_of=='one_of' and self._was_modified(self.files))):
 
                     sleep(self.lag)
                     self.job_func()
@@ -132,26 +129,23 @@ class WatcherJob:
         """returns timestamp of a file"""
         return datetime.datetime.fromtimestamp(pathlib.Path(file).stat().st_mtime)
 
-    def _was_modified(self, file: str) -> bool: 
-        """`file` was modified in the past `self.check_period` seconds"""
+    def _was_modified(self, files: List[str]) -> bool:
+        """Check if `files` were modified since the last check."""
+        modified_time = [self._check_and_update_mtime(file) for file in files]
+
+        return all(modified_time) if self.num_of == 'all_of' else any(modified_time)
+
+    def _check_and_update_mtime(self, file: str) -> bool:
+        """Check if a file was modified and update its last modification time."""
         current_mtime = self._get_mtime(file)
-        if self.mtime_last_check[file] != current_mtime:
-            self.mtime_last_check.update({file: current_mtime})
-            return True
-        else:
-            return False
+        modified = self.mtime_last_check.get(file) != current_mtime
+        if modified:
+            self.mtime_last_check[file] = current_mtime
+        return modified
 
     def _schedule_watcher_job(self) -> None:
         schedule.every(self.check_period).second.until(datetime.timedelta(hours=23, minutes=59)).do(self.check_n_do)
 
-    def _update_from_folders(self,file_path:str):
-        files = [os.path.join(file_path,f) for f in os.listdir(file_path)]
-        if self.files is None:
-            self.files = files
-        else:
-            self.files = self.files.extend(files)
-        return self
-    
 default_watcher = Watcher()
 
 def once() -> WatcherJob:
