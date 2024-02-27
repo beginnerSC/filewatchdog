@@ -67,8 +67,11 @@ class WatcherJob:
         return self
     
     def folder(self,folder_path:str):
+        files = []
         if os.path.isdir(folder_path):
-            files = [os.path.join(folder_path,f) for f in os.listdir(folder_path)]
+            for root,dir,filenames in os.walk(folder_path):
+                for file in filenames:
+                    files.append(os.path.join(root,file))
             self.one_of(files)
         else:
             raise ValueError(f"Folder path {folder_path} is not a directory")
@@ -117,8 +120,8 @@ class WatcherJob:
 
         if self.event == 'modified':
             try:
-                if ((self.num_of=='all_of' and self._was_modified(self.files)) \
-                    or (self.num_of=='one_of' and self._was_modified(self.files))):
+                if ((self.num_of=='all_of' and all([self._was_modified(file) for file in self.files])) \
+                    or (self.num_of=='one_of' and any([self._was_modified(file) for file in self.files]))):
 
                     sleep(self.lag)
                     self.job_func()
@@ -129,19 +132,14 @@ class WatcherJob:
         """returns timestamp of a file"""
         return datetime.datetime.fromtimestamp(pathlib.Path(file).stat().st_mtime)
 
-    def _was_modified(self, files: List[str]) -> bool:
-        """Check if `files` were modified since the last check."""
-        modified_time = [self._check_and_update_mtime(file) for file in files]
-
-        return all(modified_time) if self.num_of == 'all_of' else any(modified_time)
-
-    def _check_and_update_mtime(self, file: str) -> bool:
-        """Check if a file was modified and update its last modification time."""
+    def _was_modified(self, file: str) -> bool: 
+        """`file` was modified in the past `self.check_period` seconds"""
         current_mtime = self._get_mtime(file)
-        modified = self.mtime_last_check.get(file) != current_mtime
-        if modified:
-            self.mtime_last_check[file] = current_mtime
-        return modified
+        if self.mtime_last_check[file] != current_mtime:
+            self.mtime_last_check.update({file: current_mtime})
+            return True
+        else:
+            return False
 
     def _schedule_watcher_job(self) -> None:
         schedule.every(self.check_period).second.until(datetime.timedelta(hours=23, minutes=59)).do(self.check_n_do)
