@@ -31,11 +31,11 @@ watcher.once().one_of(files).modified.do(job)
 watcher.once().all_of(files).modified.do(job)
 
 
-watcher.once().file(f"C:\\Temp\\1.txt").one_of().modified.do(job)
-watcher.once().file(f"C:\\Temp\\1.txt").all_of().exist.do(job)
+watcher.once().file(f"C:\\Temp\\1.txt").modified.do(job)
+watcher.once().file(f"C:\\Temp\\1.txt").exist.do(job)
 
-watcher.once().folder("C:\Temp").one_of().modified.do(job)
-watcher.once().folder("C:\Temp").all_of().exist.do(job)
+watcher.once().folder("C:\Temp").modified.do(job)
+watcher.once().folder("C:\Temp").exist.do(job)
 while True:
     watcher.run_pending()
     time.sleep(1)
