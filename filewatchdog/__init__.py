@@ -2,6 +2,7 @@ import schedule
 import functools, datetime, logging, pathlib
 from time import sleep
 from typing import List, Optional, Callable
+import os
 
 logger = logging.getLogger("watcher")
 
@@ -54,6 +55,26 @@ class WatcherJob:
     @property
     def exist(self):
         self.event = 'exist'
+        return self
+    
+    def file(self,file_path:str):
+        if os.path.isfile(file_path):
+            self.num_of = 'one_of'
+            self.files = [file_path]
+            self.mtime_last_check.update({file_path:self._get_mtime(file_path)})
+        else:
+            raise ValueError(f"Path {file_path} is not a file")
+        return self
+    
+    def folder(self,folder_path:str):
+        files = []
+        if os.path.isdir(folder_path):
+            for root,dir,filenames in os.walk(folder_path):
+                for file in filenames:
+                    files.append(os.path.join(root,file))
+            self.one_of(files)
+        else:
+            raise ValueError(f"Folder path {folder_path} is not a directory")
         return self
             
     def one_of(self, files: List[str]): 
