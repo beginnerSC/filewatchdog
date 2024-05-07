@@ -10,11 +10,12 @@ version: 2
 build:
   os: ubuntu-22.04
   tools:
-    python: 
-      version: "3.11"
-      install:
-        - requirements: pyproject.toml
-          extras: [dev]
+    python: "3.11"
+  jobs:
+    post_install:
+      - pip install poetry
+      - poetry config virtualenvs.create false
+      - poetry install --with dev
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
