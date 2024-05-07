@@ -50,22 +50,33 @@ Usage
 
 .. code-block:: python
 
-    import filewatchdog as watcher
-    import time
+   import filewatchdog as watcher
+   import time
+   
+   def job():
+       print("I'm working...")
+   
+   
+   # detecting changes to one single file
+   
+   watcher.once().file('C:/Temp/1.txt').modified.do(job)
+   watcher.once().file('C:/Temp/1.txt').exist.do(job)
+   
+   
+   # detecting file changes in a directory recursively
+   
+   watcher.once().folder('C:/Temp').modified.do(job)
+   watcher.once().folder('C:/Temp').exist.do(job)
+   
+   
+   # watching multiple files
+   
+   files = ['C:/Temp/1.txt', 'C:/Temp/2.txt', 'C:/Temp/3.txt']
+   
+   watcher.once().one_of(files).modified.do(job)
+   watcher.once().all_of(files).exist.do(job)
 
-    def job():
-        print("I'm working...")
-
-    files = ['C:/Temp/1.txt', 'C:/Temp/2.txt', 'C:/Temp/3.txt']
-
-    watcher.once().one_of(files).modified.do(job)
-    watcher.once().all_of(files).exist.do(job)
-
-    def job_with_argument(name):
-        print(f"I am {name}")
-
-    watcher.once().all_of(files).exist.do(job_with_argument, name="Peter")
-
-    while True:
-        watcher.run_pending()
-        time.sleep(1)
+   
+   while True:
+       watcher.run_pending()
+       time.sleep(1)
