@@ -5,12 +5,6 @@
 # Required
 version: 2
 
-python:
-  version: "3.11"
-  install:
-    - requirements: pyproject.toml
-      extras: [dev]
-
 # Set the version of Python and other tools you might need
 # using poetry install on rtd: https://github.com/readthedocs/readthedocs.org/issues/4912
 build:
