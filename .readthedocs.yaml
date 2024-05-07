@@ -5,17 +5,22 @@
 # Required
 version: 2
 
+python:
+  version: "3.11"
+  install:
+    - requirements: pyproject.toml
+      extras: [dev]
+
 # Set the version of Python and other tools you might need
 # using poetry install on rtd: https://github.com/readthedocs/readthedocs.org/issues/4912
 build:
   os: ubuntu-22.04
   tools:
-    python: "3.11"
-  jobs:
-    post_install:
-      - pip install poetry
-      - poetry config virtualenvs.create false
-      - poetry install --with dev
+    python: 
+      version: "3.11"
+      install:
+        - requirements: pyproject.toml
+          extras: [dev]
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
