@@ -28,13 +28,12 @@ def job():
 # detecting changes to one single file
 
 watcher.once().file('C:/Temp/1.txt').modified.do(job)
-watcher.once().file('C:/Temp/1.txt').exist.do(job)
+watcher.once().file('C:/Temp/1.txt').exists.do(job)
 
 
 # detecting file changes in a directory recursively
 
 watcher.once().folder('C:/Temp').modified.do(job)
-watcher.once().folder('C:/Temp').exist.do(job)
 
 
 # watching multiple files

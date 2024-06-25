@@ -56,14 +56,17 @@ class WatcherJob:
     def exist(self):
         self.event = 'exist'
         return self
-    
+
+    @property
+    def exists(self):
+        self.event = 'exist'
+        return self
+
     def file(self,file_path:str):
-        if os.path.isfile(file_path):
-            self.num_of = 'one_of'
-            self.files = [file_path]
+        self.num_of = 'one_of'
+        self.files = [file_path]
+        if pathlib.Path(file).exists():
             self.mtime_last_check.update({file_path:self._get_mtime(file_path)})
-        else:
-            raise ValueError(f"Path {file_path} is not a file")
         return self
     
     def folder(self,folder_path:str):
