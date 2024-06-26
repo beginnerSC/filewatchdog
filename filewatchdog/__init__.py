@@ -65,7 +65,7 @@ class WatcherJob:
     def file(self,file_path:str):
         self.num_of = 'one_of'
         self.files = [file_path]
-        if pathlib.Path(file).exists():
+        if pathlib.Path(file_path).exists():
             self.mtime_last_check.update({file_path:self._get_mtime(file_path)})
         return self
     
