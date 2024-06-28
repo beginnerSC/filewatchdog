@@ -97,7 +97,7 @@ class WatcherJob:
                 self.mtime_last_check.update({file: self._get_mtime(file)})
         return self
 
-    def with_breadcumb(breadcrumb: str = 'C:/Temp/breadcrumb.txt'):
+    def with_breadcumb(breadcrumb: str = 'C:/Temp/breadcrumb.txt'):  # with_breadcumb must come before do or otherwise default breadcrumb will be used
         self.breadcrumb = breadcrumb
         return self
     
