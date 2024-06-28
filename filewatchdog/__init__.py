@@ -1,5 +1,6 @@
 import schedule
-import functools, datetime, logging, pathlib
+import functools, datetime, logging
+from pathlib import Path
 from time import sleep
 from typing import List, Optional, Callable
 import os
@@ -65,7 +66,7 @@ class WatcherJob:
     def file(self,file_path:str):
         self.num_of = 'one_of'
         self.files = [file_path]
-        if pathlib.Path(file_path).exists():
+        if Path(file_path).exists():
             self.mtime_last_check.update({file_path:self._get_mtime(file_path)})
         return self
     
@@ -84,7 +85,7 @@ class WatcherJob:
         self.num_of = 'one_of'
         self.files = files
         for file in self.files:
-            if pathlib.Path(file).exists():
+            if Path(file).exists():
                 self.mtime_last_check.update({file: self._get_mtime(file)})
         return self
     
@@ -92,8 +93,12 @@ class WatcherJob:
         self.num_of = 'all_of'
         self.files = files
         for file in self.files:
-            if pathlib.Path(file).exists():
+            if Path(file).exists():
                 self.mtime_last_check.update({file: self._get_mtime(file)})
+        return self
+
+    def with_breadcumb(breadcrumb: str = 'C:/Temp/breadcrumb.txt'):
+        self.breadcrumb = breadcrumb
         return self
     
     def do(self, job_func: Callable, *args, **kwargs):
@@ -110,9 +115,9 @@ class WatcherJob:
 
     def check_n_do(self):
         if self.event == 'exist':
-            if ((self.num_of=='all_of' and all([pathlib.Path(file).exists() and bool(pathlib.Path(file).stat().st_size) for file in self.files])) \
-                or (self.num_of=='one_of' and any([pathlib.Path(file).exists() and bool(pathlib.Path(file).stat().st_size) for file in self.files]))) \
-                    and not pathlib.Path(self.breadcrumb).exists():
+            if ((self.num_of=='all_of' and all([Path(file).exists() and bool(Path(file).stat().st_size) for file in self.files])) \
+                or (self.num_of=='one_of' and any([Path(file).exists() and bool(Path(file).stat().st_size) for file in self.files]))) \
+                    and not Path(self.breadcrumb).exists():
                 
                 with open(self.breadcrumb, 'w') as f:
                     current_time = datetime.datetime.now().strftime('%H:%M')
@@ -129,11 +134,11 @@ class WatcherJob:
                     sleep(self.lag)
                     self.job_func()
             except FileNotFoundError as e:
-                print(f'Watching for modification but the following files are missing: {[file for file in self.files if not pathlib.Path(file).exists()]}')
+                print(f'Watching for modification but the following files are missing: {[file for file in self.files if not Path(file).exists()]}')
 
     def _get_mtime(self, file: str) -> datetime.datetime:
         """returns timestamp of a file"""
-        return datetime.datetime.fromtimestamp(pathlib.Path(file).stat().st_mtime)
+        return datetime.datetime.fromtimestamp(Path(file).stat().st_mtime)
 
     def _was_modified(self, file: str) -> bool: 
         """`file` was modified in the past `self.check_period` seconds"""
