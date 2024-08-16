@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "filewatchdog"
-version = "0.1.3"
+version = "0.1.5"
 description = "Runs Python functions once a certain file is created or modified."
 authors = ["BeginnerSC"]
 license = "MIT"

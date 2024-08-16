@@ -150,7 +150,7 @@ class WatcherJob:
             return False
 
     def _schedule_watcher_job(self) -> None:
-        schedule.every(self.check_period).second.until(datetime.timedelta(hours=23, minutes=59)).do(self.check_n_do)
+        schedule.every(self.check_period).second.until(datetime.timedelta(days=10000)).do(self.check_n_do)
 
 default_watcher = Watcher()
 
