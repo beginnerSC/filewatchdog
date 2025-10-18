@@ -27,7 +27,7 @@ copyright = '2024, BeginnerSC'
 author = 'BeginnerSC'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+release = '0.1.5'
 
 
 # -- General configuration ---------------------------------------------------
@@ -39,7 +39,8 @@ extensions = [
     'sphinx.ext.autodoc', 
     'sphinx.ext.napoleon', 
     'sphinx.ext.viewcode', 
-    'sphinx_copybutton'    
+    'sphinx_copybutton', 
+    'sphinx_rtd_theme',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

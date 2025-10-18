@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "filewatchdog"
-version = "0.1.0"
+version = "0.1.7"
 description = "Runs Python functions once a certain file is created or modified."
 authors = ["BeginnerSC"]
 license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4.0"
+python = ">=3.12"
 schedule = "^1.2.1"
 
 [tool.poetry.group.dev.dependencies]

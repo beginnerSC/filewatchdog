@@ -24,18 +24,29 @@ import time
 def job():
     print("I'm working...")
 
+
+# detecting changes to one single file
+
+watcher.once().file('C:/Temp/1.txt').modified.do(job)
+watcher.once().file('C:/Temp/1.txt').exists.do(job)
+
+
+# detecting file changes in a directory recursively
+
+watcher.once().folder('C:/Temp').modified.do(job)
+
+
+# watching multiple files
+
 files = ['C:/Temp/1.txt', 'C:/Temp/2.txt', 'C:/Temp/3.txt']
 
-
 watcher.once().one_of(files).modified.do(job)
-watcher.once().all_of(files).modified.do(job)
+watcher.once().all_of(files).exist.do(job)
 
-
-watcher.once().file(f"C:\\Temp\\1.txt").one_of().modified.do(job)
-watcher.once().file(f"C:\\Temp\\1.txt").all_of().exist.do(job)
 
 watcher.once().folder("C:\Temp").one_of().modified.do(job)
 watcher.once().folder("C:\Temp").all_of().exist.do(job)
+
 
 while True:
     watcher.run_pending()

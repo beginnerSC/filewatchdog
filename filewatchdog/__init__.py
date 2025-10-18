@@ -1,5 +1,6 @@
 import schedule
-import functools, datetime, logging, pathlib
+import functools, datetime, logging
+from pathlib import Path
 from time import sleep
 from typing import List, Optional, Callable
 import os
@@ -56,41 +57,48 @@ class WatcherJob:
     def exist(self):
         self.event = 'exist'
         return self
-    
+
+    @property
+    def exists(self):
+        self.event = 'exist'
+        return self
+
     def file(self,file_path:str):
-        if os.path.isfile(file_path):
-            self.files = [file_path]
-        else:
-            raise ValueError(f"Path {file_path} is not a file")
+        self.num_of = 'one_of'
+        self.files = [file_path]
+        if Path(file_path).exists():
+            self.mtime_last_check.update({file_path:self._get_mtime(file_path)})
         return self
     
     def folder(self,folder_path:str):
+        files = []
         if os.path.isdir(folder_path):
-            self._update_from_folders(folder_path)
+            for root,dir,filenames in os.walk(folder_path):
+                for file in filenames:
+                    files.append(os.path.join(root,file))
+            self.one_of(files)
         else:
             raise ValueError(f"Folder path {folder_path} is not a directory")
         return self
             
-    def one_of(self, files=None): 
+    def one_of(self, files: List[str]): 
         self.num_of = 'one_of'
-        if files:
-            self.files = files
-        elif not self.files:
-            raise ValueError("No file or folder input")
+        self.files = files
         for file in self.files:
-            if pathlib.Path(file).exists():
+            if Path(file).exists():
                 self.mtime_last_check.update({file: self._get_mtime(file)})
         return self
     
-    def all_of(self, files=None): 
+    def all_of(self, files: List[str]): 
         self.num_of = 'all_of'
-        if files:
-            self.files = files
-        elif not self.files:
-            raise ValueError("No file or folder input")
+        self.files = files
         for file in self.files:
-            if pathlib.Path(file).exists():
+            if Path(file).exists():
                 self.mtime_last_check.update({file: self._get_mtime(file)})
+        return self
+
+    def with_breadcumb(breadcrumb: str = 'C:/Temp/breadcrumb.txt'):  # with_breadcumb must come before do or otherwise default breadcrumb will be used
+        self.breadcrumb = breadcrumb
         return self
     
     def do(self, job_func: Callable, *args, **kwargs):
@@ -107,9 +115,9 @@ class WatcherJob:
 
     def check_n_do(self):
         if self.event == 'exist':
-            if ((self.num_of=='all_of' and all([pathlib.Path(file).exists() and bool(pathlib.Path(file).stat().st_size) for file in self.files])) \
-                or (self.num_of=='one_of' and any([pathlib.Path(file).exists() and bool(pathlib.Path(file).stat().st_size) for file in self.files]))) \
-                    and not pathlib.Path(self.breadcrumb).exists():
+            if ((self.num_of=='all_of' and all([Path(file).exists() and bool(Path(file).stat().st_size) for file in self.files])) \
+                or (self.num_of=='one_of' and any([Path(file).exists() and bool(Path(file).stat().st_size) for file in self.files]))) \
+                    and not Path(self.breadcrumb).exists():
                 
                 with open(self.breadcrumb, 'w') as f:
                     current_time = datetime.datetime.now().strftime('%H:%M')
@@ -126,11 +134,11 @@ class WatcherJob:
                     sleep(self.lag)
                     self.job_func()
             except FileNotFoundError as e:
-                print(f'Watching for modification but the following files are missing: {[file for file in self.files if not pathlib.Path(file).exists()]}')
+                print(f'Watching for modification but the following files are missing: {[file for file in self.files if not Path(file).exists()]}')
 
     def _get_mtime(self, file: str) -> datetime.datetime:
         """returns timestamp of a file"""
-        return datetime.datetime.fromtimestamp(pathlib.Path(file).stat().st_mtime)
+        return datetime.datetime.fromtimestamp(Path(file).stat().st_mtime)
 
     def _was_modified(self, file: str) -> bool: 
         """`file` was modified in the past `self.check_period` seconds"""
@@ -142,16 +150,8 @@ class WatcherJob:
             return False
 
     def _schedule_watcher_job(self) -> None:
-        schedule.every(self.check_period).second.until(datetime.timedelta(hours=23, minutes=59)).do(self.check_n_do)
+        schedule.every(self.check_period).second.until(datetime.timedelta(days=10000)).do(self.check_n_do)
 
-    def _update_from_folders(self,file_path:str):
-        files = [os.path.join(file_path,f) for f in os.listdir(file_path)]
-        if self.files is None:
-            self.files = files
-        else:
-            self.files = self.files.extend(files)
-        return self
-    
 default_watcher = Watcher()
 
 def once() -> WatcherJob:
