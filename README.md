@@ -44,6 +44,10 @@ watcher.once().one_of(files).modified.do(job)
 watcher.once().all_of(files).exist.do(job)
 
 
+watcher.once().folder("C:\Temp").one_of().modified.do(job)
+watcher.once().folder("C:\Temp").all_of().exist.do(job)
+
+
 while True:
     watcher.run_pending()
     time.sleep(1)
